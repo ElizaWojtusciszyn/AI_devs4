@@ -58,7 +58,13 @@ public class CsvFilterService {
             String userMessage = "Filter the following CSV by this criterion: " + criteria + "\n\n" + chunks.get(i);
 
             String chunkResult = llmClient.chat(SYSTEM_PROMPT, userMessage, toolsJson);
-            JsonNode chunkJson = objectMapper.readTree(chunkResult);
+            JsonNode chunkJson;
+            try {
+                chunkJson = objectMapper.readTree(chunkResult);
+            } catch (Exception e) {
+                log.warn("Chunk {}/{} nie zwrócił JSON (brak dopasowań): {}", i + 1, chunks.size(), chunkResult);
+                continue;
+            }
             JsonNode rows = chunkJson.path("filtered_rows");
 
             for (JsonNode row : rows) {

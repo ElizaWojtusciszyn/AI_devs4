@@ -38,7 +38,7 @@ public class AnthropicSdkClient implements LlmClient {
 
     public AnthropicSdkClient(
             @Value("${anthropic.api-key}") String apiKey,
-            @Value("${anthropic.model:anthropic/claude-4.6-sonnet}") String model,
+            @Value("${anthropic.model:anthropic/claude-sonnet-4-6}") String model,
             @Value("${anthropic.max-tokens:1024}") long maxTokens
     ) {
         this.client = AnthropicOkHttpClient.builder()

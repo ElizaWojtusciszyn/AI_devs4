@@ -1,16 +1,25 @@
 package aidevs.course.solution;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 public abstract class SolutionResponse {
 
     @JsonProperty("apikey")
     private final String apiKey;
 
-     @JsonProperty("task")
+    @JsonProperty("task")
     private final String task;
+
+    protected SolutionResponse(String apiKey, String task) {
+        this.apiKey = apiKey;
+        this.task = task;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public String getTask() {
+        return task;
+    }
 }

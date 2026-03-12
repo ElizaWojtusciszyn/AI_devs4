@@ -1,4 +1,4 @@
-package aidevs.course.solution;
+package aidevs.course.s01e01.solution;
 
 import lombok.Builder;
 

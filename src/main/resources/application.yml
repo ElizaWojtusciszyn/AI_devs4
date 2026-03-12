@@ -2,12 +2,16 @@ spring:
   application:
     name: course-application
   # ── PODEJŚCIE 2: Spring AI ──────────────────────────────────
+  hub:
+    key: ea09282b-b40b-42cf-a139-dac2ac658249
+    url: https://hub.ag3nts.org/verify
+    task: people
   ai:
     anthropic:
       api-key: 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
       chat:
         options:
-          model: claude-sonnet-4-6
+          model: anthropic/claude-4.6-sonnet
           max-tokens: 1024
           temperature: 0.7
 
@@ -19,7 +23,7 @@ app:
 # ── PODEJŚCIE 1 & 3: wspólne ustawienia ───────────────────────
 anthropic:
   api-key: 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
-  model: claude-sonnet-4-6
+  model: anthropic/claude-4.6-sonnet
   max-tokens: 1024
   base-url: https://openrouter.ai/api/v1
   version: "2023-06-01"

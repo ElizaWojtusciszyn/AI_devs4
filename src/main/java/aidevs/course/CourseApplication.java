@@ -7,15 +7,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Optional;
+
 @SpringBootApplication
 public class CourseApplication implements CommandLineRunner {
 
 	private static final Logger log = LoggerFactory.getLogger(CourseApplication.class);
 
 	private final LlmClient llmClient;
+	private final Optional<LessonRunner> lessonRunner;
 
-	public CourseApplication(LlmClient llmClient) {
+	public CourseApplication(LlmClient llmClient, Optional<LessonRunner> lessonRunner) {
 		this.llmClient = llmClient;
+		this.lessonRunner = lessonRunner;
 	}
 
 	public static void main(String[] args) {
@@ -23,19 +27,14 @@ public class CourseApplication implements CommandLineRunner {
 	}
 
 	@Override
-	public void run(String... args) {
+	public void run(String... args) throws Exception {
 		log.info("=== Aktywny provider: {} ===", llmClient.providerName());
 
-		// --- Test 1: proste zapytanie ---
-		String odpowiedz = llmClient.chat("Powiedz 'Cześć!' po polsku w jednym zdaniu.");
-		log.info("Odpowiedź: {}", odpowiedz);
-
-		// --- Test 2: zapytanie z system promptem ---
-		String odpowiedz2 = llmClient.chat(
-				"Jesteś ekspertem Java. Odpowiadaj zwięźle, max 2 zdania.",
-				"Co to jest Spring AI?"
-		);
-		log.info("Odpowiedź z system promptem: {}", odpowiedz2);
+		if (lessonRunner.isPresent()) {
+			lessonRunner.get().run();
+		} else {
+			log.warn("Brak aktywnego LessonRunner – ustaw spring.hub.lesson w application.yml");
+		}
 	}
 
 }

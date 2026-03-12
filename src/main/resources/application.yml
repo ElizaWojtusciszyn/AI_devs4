@@ -6,6 +6,7 @@ spring:
     key: ea09282b-b40b-42cf-a139-dac2ac658249
     url: https://hub.ag3nts.org/verify
     task: people
+    lesson: s01e01
   ai:
     anthropic:
       api-key: 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

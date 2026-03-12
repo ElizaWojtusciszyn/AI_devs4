@@ -4,17 +4,13 @@ import aidevs.course.client.LlmClient;
 import aidevs.course.prompt.Claude.ClaudeInputSchema;
 import aidevs.course.prompt.Claude.ClaudeProperties;
 import aidevs.course.prompt.Claude.ClaudeTool;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class PersonTaggerService {
@@ -37,10 +33,12 @@ public class PersonTaggerService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public String tag(String filteredJson) throws Exception {
-        JsonNode filteredAnswer = objectMapper.readTree(filteredJson);
-        List<String> availableTags = extractTags(filteredAnswer);
+    private static final List<String> AVAILABLE_TAGS = List.of(
+            "IT", "transport", "edukacja", "medycyna",
+            "praca z ludźmi", "praca z pojazdami", "praca fizyczna"
+    );
 
+    public String tag(String filteredJson) throws Exception {
         String toolsJson = buildToolsJson();
         String userMessage = """
                 Available tags: %s
@@ -49,24 +47,14 @@ public class PersonTaggerService {
                 %s
 
                 Assign relevant tags to each person.
-                """.formatted(availableTags, filteredJson);
+                """.formatted(AVAILABLE_TAGS, filteredJson);
 
-        log.info("Tagging people with {} available tags", availableTags.size());
+        log.info("Tagging people with {} available tags", AVAILABLE_TAGS.size());
 
         String resultJson = llmClient.chat(SYSTEM_PROMPT, userMessage, toolsJson);
 
         log.info("Tagger response: {}", resultJson);
         return resultJson;
-    }
-
-    private List<String> extractTags(JsonNode filteredAnswer) {
-        Set<String> tags = new LinkedHashSet<>();
-        for (JsonNode row : filteredAnswer.path("filtered_rows")) {
-            for (JsonNode tag : row.path("tags")) {
-                tags.add(tag.asText());
-            }
-        }
-        return new ArrayList<>(tags);
     }
 
     private String buildToolsJson() throws Exception {

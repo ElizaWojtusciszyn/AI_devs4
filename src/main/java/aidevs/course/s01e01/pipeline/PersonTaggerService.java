@@ -4,13 +4,17 @@ import aidevs.course.client.LlmClient;
 import aidevs.course.prompt.Claude.ClaudeInputSchema;
 import aidevs.course.prompt.Claude.ClaudeProperties;
 import aidevs.course.prompt.Claude.ClaudeTool;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class PersonTaggerService {
@@ -33,7 +37,10 @@ public class PersonTaggerService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public String tag(String peopleJson, List<String> availableTags) throws Exception {
+    public String tag(String filteredJson) throws Exception {
+        JsonNode filteredAnswer = objectMapper.readTree(filteredJson);
+        List<String> availableTags = extractTags(filteredAnswer);
+
         String toolsJson = buildToolsJson();
         String userMessage = """
                 Available tags: %s
@@ -42,14 +49,24 @@ public class PersonTaggerService {
                 %s
 
                 Assign relevant tags to each person.
-                """.formatted(availableTags, peopleJson);
+                """.formatted(availableTags, filteredJson);
 
-        log.info("Tagging {} people with {} available tags", availableTags.size(), availableTags.size());
+        log.info("Tagging people with {} available tags", availableTags.size());
 
         String resultJson = llmClient.chat(SYSTEM_PROMPT, userMessage, toolsJson);
 
         log.info("Tagger response: {}", resultJson);
         return resultJson;
+    }
+
+    private List<String> extractTags(JsonNode filteredAnswer) {
+        Set<String> tags = new LinkedHashSet<>();
+        for (JsonNode row : filteredAnswer.path("filtered_rows")) {
+            for (JsonNode tag : row.path("tags")) {
+                tags.add(tag.asText());
+            }
+        }
+        return new ArrayList<>(tags);
     }
 
     private String buildToolsJson() throws Exception {
@@ -64,7 +81,7 @@ public class PersonTaggerService {
         );
 
         Map<String, Object> schemaProperties = Map.of(
-                "tagged_people", new ClaudeProperties("array", "List of people with assigned tags",
+                "answer", new ClaudeProperties("array", "List of people with assigned tags",
                         Map.of("type", "object", "properties", taggedPersonProperties)),
                 "total_count", new ClaudeProperties("integer", "Number of people processed")
         );
@@ -72,7 +89,7 @@ public class PersonTaggerService {
         ClaudeTool tool = new ClaudeTool(
                 "tag_people",
                 "Assigns tags to each person based on their profile and the available tag list",
-                new ClaudeInputSchema("object", schemaProperties, List.of("tagged_people", "total_count"))
+                new ClaudeInputSchema("object", schemaProperties, List.of("answer", "total_count"))
         );
 
         return objectMapper.writeValueAsString(List.of(tool));

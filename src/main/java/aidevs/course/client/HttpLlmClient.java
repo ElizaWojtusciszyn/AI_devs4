@@ -35,7 +35,7 @@ import java.time.Duration;
 public class HttpLlmClient implements LlmClient {
 
     private static final Logger log = LoggerFactory.getLogger(HttpLlmClient.class);
-    private static final String MESSAGES_ENDPOINT = "/v1/messages";
+    private static final String MESSAGES_ENDPOINT = "/messages";
 
     private final HttpClient httpClient;
     private final String apiKey;
@@ -48,7 +48,7 @@ public class HttpLlmClient implements LlmClient {
             @Value("${anthropic.api-key}") String apiKey,
             @Value("${anthropic.max-tokens:1024}") int maxTokens,
             @Value("${anthropic.base-url:https://api.anthropic.com}") String baseUrl,
-            @Value("${anthropic.model:anthropic/claude-sonnet-4.6}") String modelName
+            @Value("${anthropic.model:anthropic/claude-haiku-4-5}") String modelName
     ) {
 
         this.apiKey = apiKey;
@@ -82,9 +82,9 @@ public class HttpLlmClient implements LlmClient {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + MESSAGES_ENDPOINT))
-                    .header("x-api-key", apiKey)
-                    .header("anthropic-version", "2023-06-01")
+                    .header("Authorization", "Bearer " + apiKey)
                     .header("Content-Type", "application/json")
+                    .header("anthropic-beta", "prompt-caching-2024-07-31")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .timeout(Duration.ofSeconds(60))
                     .build();
@@ -118,7 +118,12 @@ public class HttpLlmClient implements LlmClient {
         root.put("max_tokens", maxTokens);
 
         if (systemPrompt != null && !systemPrompt.isBlank()) {
-            root.put("system", systemPrompt);
+            // Prompt caching: system jako array z cache_control
+            ArrayNode systemArray = root.putArray("system");
+            ObjectNode systemBlock = systemArray.addObject();
+            systemBlock.put("type", "text");
+            systemBlock.put("text", systemPrompt);
+            systemBlock.putObject("cache_control").put("type", "ephemeral");
         }
 
         ArrayNode messages = root.putArray("messages");
@@ -128,6 +133,12 @@ public class HttpLlmClient implements LlmClient {
 
         if (tools != null && !tools.isBlank()) {
             JsonNode toolsNode = objectMapper.readTree(tools);
+            // Prompt caching: cache_control na ostatnim toolzie
+            if (toolsNode.isArray() && !toolsNode.isEmpty()) {
+                ArrayNode toolsArray = (ArrayNode) toolsNode;
+                ObjectNode lastTool = (ObjectNode) toolsArray.get(toolsArray.size() - 1);
+                lastTool.putObject("cache_control").put("type", "ephemeral");
+            }
             root.set("tools", toolsNode);
             ObjectNode toolChoice = root.putObject("tool_choice");
             toolChoice.put("type", "auto");

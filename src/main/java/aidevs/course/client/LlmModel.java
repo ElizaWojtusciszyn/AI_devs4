@@ -7,6 +7,7 @@ public enum LlmModel {
     // Claude 4
     CLAUDE_SONNET_4_6("anthropic/claude-sonnet-4-6"),
     CLAUDE_OPUS_4_6("anthropic/claude-opus-4-6"),
+    CLAUDE_HAIKU_4_5("anthropic/claude-haiku-4-5"),
     // Claude 3.7
     CLAUDE_SONNET_3_7("anthropic/claude-3.7-sonnet"),
     // Claude 3.5

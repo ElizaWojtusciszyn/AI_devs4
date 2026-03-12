@@ -1,13 +1,14 @@
 package aidevs.course.client;
 
-import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -29,16 +30,16 @@ import java.time.Duration;
  * - Sytuacje gdy SDK ma zbyt dużo "magii"
  */
 
-@Slf4j
 @Component
 @ConditionalOnProperty(name = "app.llm.provider", havingValue = "http-client")
 public class HttpLlmClient implements LlmClient {
 
-    private static final String MESSAGES_ENDPOINT = "/v1/messages";
+    private static final Logger log = LoggerFactory.getLogger(HttpLlmClient.class);
+    private static final String CHAT_ENDPOINT = "/chat/completions";
 
     private final HttpClient httpClient;
     private final String apiKey;
-    private final Model model;
+    private final LlmModel llmModel;
     private final int maxTokens;
     private final String baseUrl;
     private final ObjectMapper objectMapper;
@@ -47,19 +48,19 @@ public class HttpLlmClient implements LlmClient {
             @Value("${anthropic.api-key}") String apiKey,
             @Value("${anthropic.max-tokens:1024}") int maxTokens,
             @Value("${anthropic.base-url:https://api.anthropic.com}") String baseUrl,
-            Model model
+            @Value("${anthropic.model:claude-sonnet-4-6}") String modelName
     ) {
 
         this.apiKey = apiKey;
         this.maxTokens = maxTokens;
         this.baseUrl = baseUrl;
-        this.model = model;
+        this.llmModel = LlmModel.fromName(modelName);
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         this.objectMapper = new ObjectMapper();
 
-        log.info("Zainicjalizowano HttpLlmClient [model={}, url={}]", model.name(), baseUrl);
+        log.info("Zainicjalizowano HttpLlmClient [model={}, url={}]", llmModel.getName(), baseUrl);
     }
 
     @Override
@@ -77,12 +78,12 @@ public class HttpLlmClient implements LlmClient {
         try {
 
             String requestBody = buildRequestBody(systemPrompt, userMessage, inputSchema);
-            log.debug("HttpClient -> POST {}{}", baseUrl, MESSAGES_ENDPOINT);
+            log.debug("HttpClient -> POST {}{}", baseUrl, CHAT_ENDPOINT);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + MESSAGES_ENDPOINT))
-                    .header("x-api-key", apiKey)
-                    .header("content-type", "application/json")
+                    .uri(URI.create(baseUrl + CHAT_ENDPOINT))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .timeout(Duration.ofSeconds(60))
                     .build();
@@ -111,22 +112,18 @@ public class HttpLlmClient implements LlmClient {
     }
 
     private String buildRequestBody(String systemPrompt, String userMessage, String inputSchema) throws Exception {
-
         ObjectNode root = objectMapper.createObjectNode();
-        root.put("model", model.name());
+        root.put("model", llmModel.getName());
         root.put("max_tokens", maxTokens);
 
-        // Opcjonalny system prompt – jako osobne pole (nie w messages)
+        ArrayNode messages = root.putArray("messages");
+
         if (systemPrompt != null && !systemPrompt.isBlank()) {
-            root.put("system", systemPrompt);
+            ObjectNode sysMsg = messages.addObject();
+            sysMsg.put("role", "system");
+            sysMsg.put("content", systemPrompt);
         }
 
-        /*
-        if (inputSchema != null && !inputSchema.isBlank()) {
-            root.put("input_schema", inputSchema);
-        }*/
-
-        ArrayNode messages = root.putArray("messages");
         ObjectNode userMsg = messages.addObject();
         userMsg.put("role", "user");
         userMsg.put("content", userMessage);
@@ -137,9 +134,10 @@ public class HttpLlmClient implements LlmClient {
     private String parseResponse(String responseBody) throws Exception {
         JsonNode root = objectMapper.readTree(responseBody);
 
-        return root.path("content")
+        return root.path("choices")
                 .get(0)
-                .path("text")
-                .asString();
+                .path("message")
+                .path("content")
+                .asText();
     }
 }

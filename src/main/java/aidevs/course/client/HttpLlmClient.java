@@ -48,7 +48,7 @@ public class HttpLlmClient implements LlmClient {
             @Value("${anthropic.api-key}") String apiKey,
             @Value("${anthropic.max-tokens:1024}") int maxTokens,
             @Value("${anthropic.base-url:https://api.anthropic.com}") String baseUrl,
-            @Value("${anthropic.model:anthropic/claude-4.6-sonnet}") String modelName
+            @Value("${anthropic.model:anthropic/claude-sonnet-4.6}") String modelName
     ) {
 
         this.apiKey = apiKey;

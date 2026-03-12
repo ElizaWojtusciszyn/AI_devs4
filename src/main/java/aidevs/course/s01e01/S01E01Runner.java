@@ -2,7 +2,7 @@ package aidevs.course.s01e01;
 
 import aidevs.course.LessonRunner;
 import aidevs.course.s01e01.pipeline.CsvFilterService;
-import aidevs.course.solution.S01E01SolutionResponse;
+import aidevs.course.s01e01.solution.S01E01SolutionResponse;
 import aidevs.course.solution.SolutionSender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,15 +22,18 @@ public class S01E01Runner implements LessonRunner {
     private final SolutionSender solutionSender;
     private final ObjectMapper objectMapper;
     private final String apiKey;
+    private final String task;
 
     public S01E01Runner(
             CsvFilterService csvFilterService,
             SolutionSender solutionSender,
-            @Value("${spring.hub.key}") String apiKey
+            @Value("${spring.hub.key}") String apiKey,
+            @Value("${spring.hub.task}") String task
     ) {
         this.csvFilterService = csvFilterService;
         this.solutionSender = solutionSender;
         this.apiKey = apiKey;
+        this.task = task;
         this.objectMapper = new ObjectMapper();
     }
 
@@ -48,7 +51,7 @@ public class S01E01Runner implements LessonRunner {
                 """);
         JsonNode answer = objectMapper.readTree(json);
 
-        String result = solutionSender.send(new S01E01SolutionResponse(apiKey, answer));
+        String result = solutionSender.send(new S01E01SolutionResponse(apiKey, task, answer));
         log.info("Odpowiedź hub: {}", result);
     }
 }

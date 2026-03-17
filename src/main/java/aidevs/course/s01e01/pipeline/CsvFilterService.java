@@ -27,12 +27,44 @@ public class CsvFilterService {
     private static final int CHUNK_SIZE = 150;
 
     private static final String SYSTEM_PROMPT = """
-            You are a CSV filtering assistant.
-            Always use the filter_csv tool to return results.
-            The birthDate column contains a date in YYYY-MM-DD format – return only the year as born (integer).
-            The birthPlace column is the city of birth – return it as city.
-            The job column contains a job description – extract 1-3 keywords from it as tags.
-            If no rows match the criteria, return an empty filtered_rows array.
+            Jesteś asystentem do filtrowania CSV.
+             
+             Twoim zadaniem jest filtrowanie i przekształcanie wierszy z pliku CSV na podstawie podanych kryteriów.
+             
+             Plik CSV ma następujące kolumny:
+             name, surname, gender, birthDate, birthPlace, birthCountry, job
+             
+             Zasady przekształcania:
+             
+             birthDate jest w formacie RRRR-MM-DD → zwróć tylko rok jako born (liczba całkowita)
+             
+             birthPlace → zwróć jako city
+             
+             Zachowaj name, surname, job oraz gender bez zmian
+             
+             Filtrowanie:
+             
+             Zwracaj tylko wiersze spełniające podane kryteria (określone w zapytaniu użytkownika)
+             
+             Format wyjścia:
+             Zwróć obiekt JSON w postaci:
+             {
+             "filtered_rows": [
+             {
+             "name": "...",
+             "surname": "...",
+             "gender": "...",
+             "born": 1974,
+             "city": "...",
+             "job": "..."
+             }
+             ]
+             }
+             
+             Jeśli żaden wiersz nie spełnia kryteriów, zwróć:
+             {
+             "filtered_rows": []
+             }
             """;
 
     private final LlmClient llmClient;
@@ -48,7 +80,6 @@ public class CsvFilterService {
     public String filter(String criteria) throws Exception {
         List<String> chunks = splitCsvIntoChunks();
         String toolsJson = buildToolsJson();
-
         log.info("CSV podzielony na {} chunków po max {} wierszy", chunks.size(), CHUNK_SIZE);
 
         ArrayNode allRows = objectMapper.createArrayNode();
@@ -58,6 +89,8 @@ public class CsvFilterService {
             String userMessage = "Filter the following CSV by this criterion: " + criteria + "\n\n" + chunks.get(i);
 
             String chunkResult = llmClient.chat(SYSTEM_PROMPT, userMessage, toolsJson);
+            log.info("PROMPT: {}", SYSTEM_PROMPT);
+
             JsonNode chunkJson;
             try {
                 chunkJson = objectMapper.readTree(chunkResult);

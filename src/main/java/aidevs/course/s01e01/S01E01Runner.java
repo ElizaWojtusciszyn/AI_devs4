@@ -41,12 +41,12 @@ public class S01E01Runner implements LessonRunner {
         log.info("=== S01E01: filtrowanie CSV ===");
 
         String filteredJson = csvFilterService.filter("""
-                Find people who meet ALL of the following criteria:
-                - gender: male
-                - born between 1986 and 2006 (age 20–40 in 2026)
-                - birthPlace: Grudziądz
-                - job related to transportation industry
-                All conditions must be satisfied simultaneously.
+                Znajdź osoby, które spełniają WSZYSTKIE poniższe kryteria:                                                                
+                 - płeć (gender): M
+                 - urodzeni między 1986 a 2006 rokiem (wiek 20–40 lat w 2026)
+                 - miejsce urodzenia: Grudziądz
+                 - zawód związany z transportem
+                 Wszystkie warunki muszą być spełnione jednocześnie.
                 """);
 
         JsonNode filteredAnswer = objectMapper.readTree(filteredJson);

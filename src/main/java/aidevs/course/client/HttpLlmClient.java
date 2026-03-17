@@ -84,7 +84,7 @@ public class HttpLlmClient implements LlmClient {
                     .uri(URI.create(baseUrl + MESSAGES_ENDPOINT))
                     .header("Authorization", "Bearer " + apiKey)
                     .header("Content-Type", "application/json")
-                    .header("anthropic-beta", "prompt-caching-2024-07-31")
+                   // .header("anthropic-beta", "prompt-caching-2024-07-31")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .timeout(Duration.ofSeconds(60))
                     .build();
@@ -123,7 +123,7 @@ public class HttpLlmClient implements LlmClient {
             ObjectNode systemBlock = systemArray.addObject();
             systemBlock.put("type", "text");
             systemBlock.put("text", systemPrompt);
-            systemBlock.putObject("cache_control").put("type", "ephemeral");
+           // systemBlock.putObject("cache_control").put("type", "ephemeral");
         }
 
         ArrayNode messages = root.putArray("messages");
@@ -137,11 +137,11 @@ public class HttpLlmClient implements LlmClient {
             if (toolsNode.isArray() && !toolsNode.isEmpty()) {
                 ArrayNode toolsArray = (ArrayNode) toolsNode;
                 ObjectNode lastTool = (ObjectNode) toolsArray.get(toolsArray.size() - 1);
-                lastTool.putObject("cache_control").put("type", "ephemeral");
+                //lastTool.putObject("cache_control").put("type", "ephemeral");
             }
             root.set("tools", toolsNode);
             ObjectNode toolChoice = root.putObject("tool_choice");
-            toolChoice.put("type", "auto");
+            toolChoice.put("type", "any");
         }
 
         return objectMapper.writeValueAsString(root);

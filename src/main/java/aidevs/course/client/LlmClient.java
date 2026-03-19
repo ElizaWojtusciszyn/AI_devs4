@@ -34,4 +34,6 @@ public interface LlmClient {
      */
     String providerName();
 
+    //Flux<String> stream(String systemPrompt, String userMessage)
+
 }

@@ -46,11 +46,11 @@ public class HttpLlmClient implements LlmClient {
 
     public HttpLlmClient(
             @Value("${anthropic.api-key}") String apiKey,
-            @Value("${anthropic.max-tokens:1024}") int maxTokens,
-            @Value("${anthropic.base-url:https://api.anthropic.com}") String baseUrl,
-            @Value("${anthropic.model:anthropic/claude-haiku-4-5}") String modelName
+            @Value("${anthropic.max-tokens}") int maxTokens,
+            @Value("${anthropic.base-url}") String baseUrl,
+            @Value("${anthropic.model}") String modelName,
+            ObjectMapper objectMapper
     ) {
-
         this.apiKey = apiKey;
         this.maxTokens = maxTokens;
         this.baseUrl = baseUrl;
@@ -58,7 +58,7 @@ public class HttpLlmClient implements LlmClient {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = objectMapper;
 
         log.info("Zainicjalizowano HttpLlmClient [model={}, url={}]", llmModel.getName(), baseUrl);
     }
@@ -84,7 +84,6 @@ public class HttpLlmClient implements LlmClient {
                     .uri(URI.create(baseUrl + MESSAGES_ENDPOINT))
                     .header("Authorization", "Bearer " + apiKey)
                     .header("Content-Type", "application/json")
-                   // .header("anthropic-beta", "prompt-caching-2024-07-31")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .timeout(Duration.ofSeconds(60))
                     .build();
@@ -112,7 +111,7 @@ public class HttpLlmClient implements LlmClient {
         return "Raw HTTP (java.net.http.HttpClient)";
     }
 
-    private String buildRequestBody(String systemPrompt, String userMessage, String tools) throws Exception {
+    private String buildRequestBody(String systemPrompt, String userMessage, String tools) throws IOException {
         ObjectNode root = objectMapper.createObjectNode();
         root.put("model", llmModel.getName());
         root.put("max_tokens", maxTokens);
@@ -123,7 +122,6 @@ public class HttpLlmClient implements LlmClient {
             ObjectNode systemBlock = systemArray.addObject();
             systemBlock.put("type", "text");
             systemBlock.put("text", systemPrompt);
-           // systemBlock.putObject("cache_control").put("type", "ephemeral");
         }
 
         ArrayNode messages = root.putArray("messages");
@@ -133,12 +131,6 @@ public class HttpLlmClient implements LlmClient {
 
         if (tools != null && !tools.isBlank()) {
             JsonNode toolsNode = objectMapper.readTree(tools);
-            // Prompt caching: cache_control na ostatnim toolzie
-            if (toolsNode.isArray() && !toolsNode.isEmpty()) {
-                ArrayNode toolsArray = (ArrayNode) toolsNode;
-                ObjectNode lastTool = (ObjectNode) toolsArray.get(toolsArray.size() - 1);
-                //lastTool.putObject("cache_control").put("type", "ephemeral");
-            }
             root.set("tools", toolsNode);
             ObjectNode toolChoice = root.putObject("tool_choice");
             toolChoice.put("type", "any");
@@ -147,7 +139,7 @@ public class HttpLlmClient implements LlmClient {
         return objectMapper.writeValueAsString(root);
     }
 
-    private String parseResponse(String responseBody) throws Exception {
+    private String parseResponse(String responseBody) throws IOException {
         JsonNode root = objectMapper.readTree(responseBody);
         JsonNode contentArray = root.path("content");
 

@@ -47,22 +47,14 @@ public class SpringAiClient implements LlmClient {
                 .content();
     }
 
+    /**
+     * Spring AI nie obsługuje natywnie surowego JSON narzędzi w tym formacie.
+     * Parametr {@code inputSchema} jest ignorowany — użyj HttpLlmClient dla tool use.
+     */
     @Override
     public String chat(String systemPrompt, String userMessage, String inputSchema) {
-        log.debug("SpringAI -> wysyłam zapytanie [system={}, user.len={}]",
-                systemPrompt != null, userMessage.length());
-
-
-        var prompt = client.prompt();
-
-        if (systemPrompt != null && !systemPrompt.isBlank()) {
-            prompt = prompt.system(systemPrompt);
-        }
-
-        return prompt
-                .user(userMessage)
-                .call()
-                .content();
+        log.warn("SpringAiClient: parametr inputSchema jest ignorowany — tool use wymaga HttpLlmClient");
+        return chat(systemPrompt, userMessage);
     }
 
     @Override

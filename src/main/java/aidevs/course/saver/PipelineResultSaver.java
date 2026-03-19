@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,7 +29,7 @@ public class PipelineResultSaver {
         this.lesson = lesson;
     }
 
-    public Path save(String pipelineName, String json) throws Exception {
+    public Path save(String pipelineName, String json) throws IOException {
         String timestamp = LocalDateTime.now().format(TIMESTAMP);
         String filename = lesson + "_" + pipelineName + "_" + timestamp + ".json";
 

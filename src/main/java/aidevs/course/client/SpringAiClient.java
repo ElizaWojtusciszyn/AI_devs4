@@ -3,6 +3,7 @@ package aidevs.course.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +15,13 @@ public class SpringAiClient implements LlmClient {
 
     private final ChatClient client;
 
-    public SpringAiClient(ChatClient.Builder builder) {
-        this.client = builder.build();
-        log.info("Zainicjalizowano SpringAiClient");
+    public SpringAiClient(
+            ChatClient.Builder builder,
+            @Value("${spring.ai.openai.base-url}") String baseUrl
+    ) {
+        this.client = builder
+                .build();
+        log.info("Zainicjalizowano SpringAiClient [base-url={}]", baseUrl);
     }
 
     @Override
@@ -59,6 +64,6 @@ public class SpringAiClient implements LlmClient {
 
     @Override
     public String providerName() {
-        return "Spring AI 1.0.3 (Anthropic)";
+        return "Spring AI (OpenRouter → anthropic/claude-sonnet-4-6)";
     }
 }

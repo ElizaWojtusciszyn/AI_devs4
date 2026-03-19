@@ -35,6 +35,7 @@ public class PersonTaggerService {
                 { "name": "Anna", "surname": "Nowak", "gender": "F", "born": 1993, "city": "Gdańsk", "tags": ["medycyna", "praca z ludźmi"] }
               ]
             }
+            
             """;
 
     private final LlmClient llmClient;

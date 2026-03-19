@@ -10,6 +10,7 @@ public abstract class SolutionResponse {
     @JsonProperty("task")
     private final String task;
 
+
     protected SolutionResponse(String apiKey, String task) {
         this.apiKey = apiKey;
         this.task = task;

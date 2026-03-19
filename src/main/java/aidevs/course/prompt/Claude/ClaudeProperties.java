@@ -5,29 +5,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Map;
 
 /**
- * Reprezentuje schemat pojedynczej właściwości w input_schema.
- * Używany jako wartość w Map<String, Object> properties.
- *
- * Przykład dla pola tablicowego:
- *   new ClaudeProperty("array", "Opis", Map.of("type","object", "properties", innerProps))
- *
- * Przykład dla pola prostego:
- *   new ClaudeProperty("integer", "Opis")
+ * Schemat pojedynczej właściwości w input_schema narzędzia Claude.
+ * <p>
+ * Przykład dla pola prostego:   {@code new ClaudeProperties("integer", "Opis", null)}
+ * Przykład dla pola tablicowego: {@code new ClaudeProperties("array", "Opis", Map.of("type","object", "properties", innerProps))}
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ClaudeProperties {
-    public String type;
-    public String description;
-    public Map<String, Object> items;
-
+public record ClaudeProperties(
+        String type,
+        String description,
+        Map<String, Object> items
+) {
     public ClaudeProperties(String type, String description) {
-        this.type = type;
-        this.description = description;
-    }
-
-    public ClaudeProperties(String type, String description, Map<String, Object> items) {
-        this.type = type;
-        this.description = description;
-        this.items = items;
+        this(type, description, null);
     }
 }

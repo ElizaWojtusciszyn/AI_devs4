@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,40 +19,30 @@ public class PersonTaggerService {
     private static final Logger log = LoggerFactory.getLogger(PersonTaggerService.class);
 
     private static final String SYSTEM_PROMPT = """
-            Jesteś asystentem do tagowania.
-            Dla każdej osoby na liście przypisz wszystkie tagi z podanej listy tagów, które pasują do jej profilu.
-            Opieraj swoje decyzje na opisie stanowiska(job), imieniu(name), płci(geneder), wieku i mieście danej osoby(city).
-            Osoba może mieć wiele tagów lub żadnego.
-            Oprócz pozostałych pół zwróć również kolumna tags zawiera liste tagów.
+            Jesteś asystentem do tagowania osób na podstawie opisu stanowiska (pole job).
 
-            Zawsze używaj narzędzia answer do zwracania wyników.
-            Przykładowy rezultat: 
-            "answer": [
-                     {
-                       "name": "Jan",
-                       "surname": "Kowalski",
-                       "gender": "M",
-                       "born": 1987,
-                       "city": "Warszawa",
-                       "tags": ["tag1", "tag2"]
-                     },
-                     {
-                        "name": "Anna",
-                        "surname": "Nowak",
-                        "gender": "F",
-                        "born": 1993,
-                        "city": "Grudziądz",
-                        "tags": ["tagA", "tagB", "tagC"]
-                      }
-                ]
+            ## Zasady tagowania
+            - Rozważ każdy dostępny tag OSOBNO i przypisz go, jeśli opis stanowiska daje ku temu uzasadnienie.
+            - Przypisuj WSZYSTKIE pasujące tagi — nie ograniczaj się do jednego.
+            - Osoba może mieć wiele tagów lub żadnego.
+            - Nie dodawaj tagów spoza dostępnej listy.
+
+            ## Format wyjścia
+            Użyj narzędzia answer. Przykład:
+            {
+              "answer": [
+                { "name": "Jan", "surname": "Kowalski", "gender": "M", "born": 1987, "city": "Warszawa", "tags": ["transport", "praca z pojazdami", "praca fizyczna"] },
+                { "name": "Anna", "surname": "Nowak", "gender": "F", "born": 1993, "city": "Gdańsk", "tags": ["medycyna", "praca z ludźmi"] }
+              ]
+            }
             """;
 
     private final LlmClient llmClient;
     private final ObjectMapper objectMapper;
 
-    public PersonTaggerService(LlmClient llmClient) {
+    public PersonTaggerService(LlmClient llmClient, ObjectMapper objectMapper) {
         this.llmClient = llmClient;
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = objectMapper;
     }
 
     private static final List<String> AVAILABLE_TAGS = List.of(
@@ -59,7 +50,7 @@ public class PersonTaggerService {
             "praca z ludźmi", "praca z pojazdami", "praca fizyczna"
     );
 
-    public String tag(String filteredJson) throws Exception {
+    public String tag(String filteredJson) throws IOException {
         String toolsJson = buildToolsJson();
         String userMessage = """
                 Dostępne tagi: %s
@@ -72,7 +63,7 @@ public class PersonTaggerService {
 
         log.info("Tagging people with {} available tags", AVAILABLE_TAGS.size());
 
-        log.info("PROMPT: {}", SYSTEM_PROMPT);
+        log.debug("PROMPT: {}", SYSTEM_PROMPT);
 
         String resultJson = llmClient.chat(SYSTEM_PROMPT, userMessage, toolsJson);
 
@@ -80,7 +71,7 @@ public class PersonTaggerService {
         return resultJson;
     }
 
-    private String buildToolsJson() throws Exception {
+    private String buildToolsJson() throws IOException {
         Map<String, Object> taggedPersonProperties = Map.of(
                 "name",    new ClaudeProperties("string", null),
                 "surname", new ClaudeProperties("string", null),

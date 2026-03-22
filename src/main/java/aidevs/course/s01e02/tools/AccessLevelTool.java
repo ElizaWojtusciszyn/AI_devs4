@@ -1,6 +1,6 @@
 package aidevs.course.s01e02.tools;
 
-import aidevs.course.s01e02.clients.AccessLevelRestClient;
+import aidevs.course.s01e02.clients.accesslevel.AccessLevelRestClient;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;

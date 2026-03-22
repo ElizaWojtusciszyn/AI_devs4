@@ -1,4 +1,4 @@
-package aidevs.course.s01e02.clients;
+package aidevs.course.s01e02.clients.accesslevel;
 
 import lombok.Builder;
 

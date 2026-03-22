@@ -15,11 +15,14 @@ public class S01E02Runner implements LessonRunner {
 
     private static final Logger log = LoggerFactory.getLogger(S01E02Runner.class);
 
+    private final ChatService chatService;
     private final ObjectMapper objectMapper;
 
     public S01E02Runner(
+            ChatService chatService,
             ObjectMapper objectMapper
     ) {
+        this.chatService = chatService;
         this.objectMapper = objectMapper;
     }
 

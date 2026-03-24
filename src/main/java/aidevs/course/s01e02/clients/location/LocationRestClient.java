@@ -1,7 +1,7 @@
 package aidevs.course.s01e02.clients.location;
 
 import aidevs.course.s01e02.S01E02Runner;
-import aidevs.course.s01e02.clients.accesslevel.AccessLevelRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,16 +23,15 @@ public class LocationRestClient {
     public String post(String apikey,
                        String name,
                        String surname) {
-        AccessLevelRequest request = AccessLevelRequest.builder()
+        LocationRequest request = LocationRequest.builder()
                 .apikey(apikey)
                 .name(name)
                 .surname(surname)
                 .build();
 
-        log.info("=== POST [{s}] ===".formatted(request));
+        log.info("=== POST [%s] ===".formatted(request));
 
         return restClient.post()
-                .uri(locationRestClientConfiguration.baseUrl)
                 .body(request)
                 .retrieve()
                 .body(String.class);

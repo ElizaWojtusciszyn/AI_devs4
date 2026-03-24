@@ -30,10 +30,9 @@ public class AccessLevelRestClient {
                 .birthYear(birthYear)
                 .build();
 
-        log.info("=== POST [{s}] ===".formatted(request));
+        log.info("=== POST [%s] ===".formatted(request));
 
         return restClient.post()
-                .uri(accessLevelRestClientConfiguration.baseUrl)
                 .body(request)
                 .retrieve()
                 .body(String.class);

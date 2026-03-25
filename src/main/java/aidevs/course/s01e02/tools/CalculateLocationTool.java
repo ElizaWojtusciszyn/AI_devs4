@@ -1,5 +1,6 @@
 package aidevs.course.s01e02.tools;
 
+import aidevs.course.s01e02.clients.CalculateLocation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;

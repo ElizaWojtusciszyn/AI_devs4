@@ -1,4 +1,4 @@
-package aidevs.course.s01e02;
+package aidevs.course.s01e02.entities;
 
 import aidevs.course.solution.SolutionResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;

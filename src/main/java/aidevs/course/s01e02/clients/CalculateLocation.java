@@ -1,4 +1,4 @@
-package aidevs.course.s01e02.tools;
+package aidevs.course.s01e02.clients;
 
 import org.springframework.stereotype.Component;
 

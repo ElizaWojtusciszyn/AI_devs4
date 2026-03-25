@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mvn dependency:tree -Dincludes=org.projectlombok)"
+      "Bash(mvn dependency:tree -Dincludes=org.projectlombok)",
+      "Bash(find . -type f -name README.md -o -name CLAUDE.md -o -name .cursorrules -o -name *copilot*)"
     ]
   }
 }

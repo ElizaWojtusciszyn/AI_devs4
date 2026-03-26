@@ -1,0 +1,35 @@
+package aidevs.course.s01e03;
+
+import aidevs.course.s01e02.tools.AccessLevelTool;
+import aidevs.course.s01e02.tools.CalculateLocationTool;
+import aidevs.course.s01e02.tools.LocationTool;
+import aidevs.course.tools.ITool;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class ChatService {
+
+    private final ChatClient chatClient;
+
+    public ChatService(ChatClient.Builder builder,
+                       List<ITool> toolList,
+                       SyncMcpToolCallbackProvider mcpToolCallbackProvider
+    ) {
+        this.chatClient = builder.build()
+                .mutate()
+                .defaultTools(toolList)          // własne narzędzia
+                .defaultTools(mcpToolCallbackProvider)  // + MCP
+                .build();
+    }
+
+    public String chat(String systemPrompt, String userMessage) {
+        return chatClient.prompt()
+                .system(systemPrompt)
+                .user(userMessage)
+                .call()
+                .content();
+    }
+}

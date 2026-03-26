@@ -45,8 +45,8 @@ public class ProcessMessage {
                 ? result.substring(result.indexOf('{'), result.lastIndexOf('}') + 1)
                 : result;
 
-        String answer =
-                objectMapper.readValue(jsonStr, FindHimSolutionResponse.FindHimAnswer.class);
+        String answer ="aa";
+       //         objectMapper.readValue(jsonStr, FindHimSolutionResponse.FindHimAnswer.class);
 
         return answer;
 

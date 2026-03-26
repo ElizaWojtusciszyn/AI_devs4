@@ -1,10 +1,8 @@
 package aidevs.course.s01e03;
 
-import aidevs.course.s01e02.tools.AccessLevelTool;
-import aidevs.course.s01e02.tools.CalculateLocationTool;
-import aidevs.course.s01e02.tools.LocationTool;
 import aidevs.course.tools.ITool;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

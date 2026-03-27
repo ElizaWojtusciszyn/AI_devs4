@@ -3,6 +3,7 @@ package aidevs.course.s01e03;
 import aidevs.course.tools.ITool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +17,13 @@ public class ChatService {
                        List<ITool> toolList,
                        SyncMcpToolCallbackProvider mcpToolCallbackProvider
     ) {
+        var methodTools = MethodToolCallbackProvider.builder()
+                .toolObjects(toolList.toArray())
+                .build();
         this.chatClient = builder.build()
                 .mutate()
-                .defaultTools(toolList)
-                .defaultTools(mcpToolCallbackProvider)
+                .defaultToolCallbacks(methodTools)
+                .defaultToolCallbacks(mcpToolCallbackProvider)
                 .build();
     }
 

@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(mvn dependency:tree -Dincludes=org.projectlombok)",
-      "Bash(find . -type f -name README.md -o -name CLAUDE.md -o -name .cursorrules -o -name *copilot*)"
+      "Bash(find . -type f -name README.md -o -name CLAUDE.md -o -name .cursorrules -o -name *copilot*)",
+      "Bash(xargs grep:*)",
+      "Bash(find c:UserselizaDocumentsAI_DEVSmcp-server-javasrc -name *.java)",
+      "Bash(curl -s http://localhost:3000/health)",
+      "Bash(curl -s -X POST http://localhost:3000/mcp -H \"Content-Type: application/json\" -d '{\"\"jsonrpc\"\":\"\"2.0\"\",\"\"id\"\":1,\"\"method\"\":\"\"initialize\"\",\"\"params\"\":{\"\"protocolVersion\"\":\"\"2024-11-05\"\",\"\"capabilities\"\":{},\"\"clientInfo\"\":{\"\"name\"\":\"\"test\"\",\"\"version\"\":\"\"1.0\"\"}}}')",
+      "Bash(jar -tf \"$HOME/.m2/repository/org/springframework/ai/spring-ai-autoconfigure-mcp-client-common/2.0.0-M2/spring-ai-autoconfigure-mcp-client-common-2.0.0-M2.jar\")",
+      "Bash(jar -xf $HOME/.m2/repository/org/springframework/ai/spring-ai-autoconfigure-mcp-client-common/2.0.0-M2/spring-ai-autoconfigure-mcp-client-common-2.0.0-M2.jar META-INF/spring-configuration-metadata.json -C /tmp/mcp-meta)",
+      "Read(//c/Users/eliza/Documents/AI_DEVS/Course/course/$HOME/.m2/repository/org/springframework/ai/spring-ai-autoconfigure-mcp-client-common/2.0.0-M2/**)",
+      "Bash(python3 -c \":*)",
+      "Bash(jar -tf \"$HOME/.m2/repository/org/springframework/ai/spring-ai-autoconfigure-mcp-client-httpclient/2.0.0-M2/spring-ai-autoconfigure-mcp-client-httpclient-2.0.0-M2.jar\")",
+      "Bash(grep -v \"/$\")",
+      "Bash(jar -tf $HOME/.m2/repository/org/springframework/ai/spring-ai-starter-mcp-client/2.0.0-M2/spring-ai-starter-mcp-client-2.0.0-M2.jar)",
+      "Bash(jar -tf \"$HOME/.m2/repository/org/springframework/ai/spring-ai-model/2.0.0-M2/spring-ai-model-2.0.0-M2.jar\")",
+      "Bash(grep -v \"class$\")",
+      "Bash(grep -v \"$\")",
+      "Bash(grep \"\\\\.class$\")"
     ]
   }
 }

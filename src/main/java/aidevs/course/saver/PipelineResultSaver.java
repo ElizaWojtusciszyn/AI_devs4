@@ -1,7 +1,6 @@
 package aidevs.course.saver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +17,8 @@ import java.time.format.DateTimeFormatter;
  * Ścieżka: src/main/resources/{lesson}/
  */
 @Component
+@Slf4j
 public class PipelineResultSaver {
-
-    private static final Logger log = LoggerFactory.getLogger(PipelineResultSaver.class);
     private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     private final String lesson;
@@ -39,7 +37,7 @@ public class PipelineResultSaver {
         Path file = dir.resolve(filename);
         Files.writeString(file, json, StandardCharsets.UTF_8);
 
-        log.info("Zapisano wynik pipeline '{}' do: {}", pipelineName, file.toAbsolutePath());
+        log.info("Zapisano wynik '{}' do: {}", pipelineName, file.toAbsolutePath());
         return file;
     }
 

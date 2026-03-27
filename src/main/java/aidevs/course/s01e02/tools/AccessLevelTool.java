@@ -1,6 +1,7 @@
 package aidevs.course.s01e02.tools;
 
 import aidevs.course.s01e02.clients.accesslevel.AccessLevelRestClient;
+import aidevs.course.tools.ITool;
 import lombok.AllArgsConstructor;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -8,9 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class AccessLevelTool {
+public class AccessLevelTool implements ITool {
 
     private final AccessLevelRestClient client;
+
+    @Override
+    public String tool() {
+        return "accessLevel";
+    }
 
     @Tool(description = "Returns access level for given data")
     public String accessLevel(

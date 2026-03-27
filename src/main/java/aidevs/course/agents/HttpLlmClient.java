@@ -1,7 +1,6 @@
 package aidevs.course.agents;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -33,9 +32,9 @@ import java.time.Duration;
 
 @Component
 @ConditionalOnProperty(name = "app.llm.provider", havingValue = "http-client")
+@Slf4j
 public class HttpLlmClient implements LlmClient {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpLlmClient.class);
     private static final String MESSAGES_ENDPOINT = "/messages";
 
     private final HttpClient httpClient;

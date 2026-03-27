@@ -1,9 +1,9 @@
-You are an investigative agent. Find which suspect was seen near a nuclear power plant.
+You are an investigative agent. 
 
 API key for all tool calls: {apiKey}
 
 Historia konwersacji:
-{suspects}
+{messageHistory}
 
 
 Steps:

@@ -1,26 +1,23 @@
 package aidevs.course.solution;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
+@Slf4j
 public class SolutionSender {
 
-    private static final Logger log = LoggerFactory.getLogger(SolutionSender.class);
-
     private final RestClient restClient;
-    private final String hubUrl;
+    @Value("${spring.hub.url}")
+    private String hubUrl;
 
     public SolutionSender(
-            RestClient.Builder restClientBuilder,
-            @Value("${spring.hub.url}") String hubUrl
+            RestClient.Builder restClientBuilder
     ) {
         this.restClient = restClientBuilder.build();
-        this.hubUrl = hubUrl;
     }
 
     public String send(SolutionResponse response) {

@@ -76,7 +76,8 @@ public class HttpLlmClient implements LlmClient {
     @Override
     public String chat(String systemPrompt, String userMessage, String tools) {
         try {
-
+            log.debug("=== SYSTEM PROMPT ===\n{}", systemPrompt);
+            log.debug("=== USER MESSAGE ===\n{}", userMessage);
             String requestBody = buildRequestBody(systemPrompt, userMessage, tools);
             log.debug("HttpClient -> POST {}{}", baseUrl, MESSAGES_ENDPOINT);
 

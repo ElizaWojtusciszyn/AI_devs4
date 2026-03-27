@@ -11,13 +11,14 @@ import org.springframework.web.client.RestClient;
 public class SolutionSender {
 
     private final RestClient restClient;
-    @Value("${spring.hub.url}")
-    private String hubUrl;
+    private final String hubUrl;
 
     public SolutionSender(
-            RestClient.Builder restClientBuilder
+            RestClient.Builder restClientBuilder,
+            @Value("${spring.hub.url}") String hubUrl
     ) {
         this.restClient = restClientBuilder.build();
+        this.hubUrl = hubUrl;
     }
 
     public String send(SolutionResponse response) {

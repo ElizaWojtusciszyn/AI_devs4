@@ -13,11 +13,6 @@ public class AccessLevelTool implements ITool {
 
     private final AccessLevelRestClient client;
 
-    @Override
-    public String tool() {
-        return "accessLevel";
-    }
-
     @Tool(description = "Returns access level for given data")
     public String accessLevel(
             @ToolParam(description = "Individual api key")

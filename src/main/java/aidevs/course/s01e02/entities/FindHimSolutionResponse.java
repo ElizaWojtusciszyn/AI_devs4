@@ -13,10 +13,6 @@ public class FindHimSolutionResponse extends SolutionResponse {
         this.answer = answer;
     }
 
-    public FindHimAnswer getAnswer() {
-        return answer;
-    }
-
     public record FindHimAnswer(
             @JsonProperty("name") String name,
             @JsonProperty("surname") String surname,

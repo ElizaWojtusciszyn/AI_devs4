@@ -1,13 +1,14 @@
 package aidevs.course.s01e01;
 
 import aidevs.course.LessonRunner;
+import aidevs.course.prompt.PromptLoader;
 import aidevs.course.s01e01.pipeline.CsvFilterService;
 import aidevs.course.s01e01.pipeline.PersonTaggerService;
 import aidevs.course.saver.PipelineResultSaver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -15,37 +16,15 @@ import java.io.IOException;
 
 @Component
 @ConditionalOnProperty(name = "spring.hub.lesson", havingValue = "s01e01")
+@RequiredArgsConstructor
+@Slf4j
 public class S01E01Runner implements LessonRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(S01E01Runner.class);
-
-    private static final String FILTER_CRITERIA = """
-            Znajdź osoby spełniające WSZYSTKIE poniższe kryteria jednocześnie:
-             1. gender = "M"
-             2. Wiek osoby musi wynosić dokładnie od 20 do 40 lat względem daty 2026-03-19.
-                Pole birthDate ma format RRRR-MM-DD. Porównuj pełną datę (rok, miesiąc, dzień).
-                Uwzględnij osoby, których birthDate >= 1986-03-19 ORAZ birthDate <= 2006-03-19.
-                ODRZUĆ każdą osobę spoza tego zakresu dat.
-             3. birthPlace = "Grudziądz" (dokładne dopasowanie)
-             4. Opis w polu job wskazuje na branżę transportową (transport towarów, logistyka, kierowca, spedycja itp.)
-            """;
 
     private final CsvFilterService csvFilterService;
     private final PersonTaggerService personTaggerService;
     private final PipelineResultSaver resultSaver;
     private final ObjectMapper objectMapper;
-
-    public S01E01Runner(
-            CsvFilterService csvFilterService,
-            PersonTaggerService personTaggerService,
-            PipelineResultSaver resultSaver,
-            ObjectMapper objectMapper
-    ) {
-        this.csvFilterService = csvFilterService;
-        this.personTaggerService = personTaggerService;
-        this.resultSaver = resultSaver;
-        this.objectMapper = objectMapper;
-    }
+    private final PromptLoader promptLoader;
 
     @Override
     public void run() throws IOException {
@@ -55,7 +34,8 @@ public class S01E01Runner implements LessonRunner {
     }
 
     private String filterAndSave() throws IOException {
-        String filteredJson = csvFilterService.filter(FILTER_CRITERIA);
+        String filterCriteria = promptLoader.load("prompts/s01e01/filter-criteria.md");
+        String filteredJson = csvFilterService.filter(filterCriteria);
         JsonNode filteredAnswer = objectMapper.readTree(filteredJson);
         resultSaver.save("csv_filter_answer", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(filteredAnswer));
         log.info("Zapisano wynik filtrowania CSV");

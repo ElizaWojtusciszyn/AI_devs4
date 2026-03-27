@@ -22,11 +22,6 @@ public class CalculateLocationTool implements ITool {
             @ToolParam(description = "Longitude of second location (e.g. power plant)") double lon2
     ) {}
 
-    @Override
-    public String tool() {
-        return "calculateDistance";
-    }
-
     @Tool(description = "Calculates distance in km between two geographic coordinates using Haversine formula. Use this to check how far a person's location is from a power plant.")
     public String calculateDistance(CalculateDistanceRequest request) {
         double distance = calculateLocation.distanceKm(request.lat1(), request.lon1(), request.lat2(), request.lon2());

@@ -1,5 +1,6 @@
 package aidevs.course.prompt;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -9,13 +10,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class PromptLoader {
 
     private final ResourceLoader resourceLoader;
-
-    public PromptLoader(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
 
     public String load(String classpathPath, Map<String, Object> variables) throws IOException {
         var resource = resourceLoader.getResource("classpath:" + classpathPath);

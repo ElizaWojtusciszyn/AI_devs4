@@ -13,11 +13,6 @@ public class LocationTool implements ITool {
 
     private final LocationRestClient client;
 
-    @Override
-    public String tool() {
-        return "location";
-    }
-
     @Tool(description = "Returns location for rest client for given data")
     public String location(
             @ToolParam(description = "Individual api key")

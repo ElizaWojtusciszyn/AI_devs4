@@ -4,9 +4,10 @@ import aidevs.course.agents.LlmClient;
 import aidevs.course.prompt.Claude.ClaudeInputSchema;
 import aidevs.course.prompt.Claude.ClaudeProperties;
 import aidevs.course.prompt.Claude.ClaudeTool;
+import aidevs.course.prompt.PromptLoader;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,44 +15,21 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class PersonTaggerService {
-
-    private static final Logger log = LoggerFactory.getLogger(PersonTaggerService.class);
-
-    private static final String SYSTEM_PROMPT = """
-            Jesteś asystentem do tagowania osób na podstawie opisu stanowiska (pole job).
-
-            ## Zasady tagowania
-            - Rozważ każdy dostępny tag OSOBNO i przypisz go, jeśli opis stanowiska daje ku temu uzasadnienie.
-            - Przypisuj WSZYSTKIE pasujące tagi — nie ograniczaj się do jednego.
-            - Osoba może mieć wiele tagów lub żadnego.
-            - Nie dodawaj tagów spoza dostępnej listy.
-
-            ## Format wyjścia
-            Użyj narzędzia answer. Przykład:
-            {
-              "answer": [
-                { "name": "Jan", "surname": "Kowalski", "gender": "M", "born": 1987, "city": "Warszawa", "tags": ["transport", "praca z pojazdami", "praca fizyczna"] },
-                { "name": "Anna", "surname": "Nowak", "gender": "F", "born": 1993, "city": "Gdańsk", "tags": ["medycyna", "praca z ludźmi"] }
-              ]
-            }
-            
-            """;
-
-    private final LlmClient llmClient;
-    private final ObjectMapper objectMapper;
-
-    public PersonTaggerService(LlmClient llmClient, ObjectMapper objectMapper) {
-        this.llmClient = llmClient;
-        this.objectMapper = objectMapper;
-    }
 
     private static final List<String> AVAILABLE_TAGS = List.of(
             "IT", "transport", "edukacja", "medycyna",
             "praca z ludźmi", "praca z pojazdami", "praca fizyczna"
     );
 
+    private final LlmClient llmClient;
+    private final ObjectMapper objectMapper;
+    private final PromptLoader promptLoader;
+
     public String tag(String filteredJson) throws IOException {
+        String systemPrompt = promptLoader.load("prompts/s01e01/person-tagger-system.md");
         String toolsJson = buildToolsJson();
         String userMessage = """
                 Dostępne tagi: %s
@@ -63,11 +41,7 @@ public class PersonTaggerService {
                 """.formatted(AVAILABLE_TAGS, filteredJson);
 
         log.info("Tagging people with {} available tags", AVAILABLE_TAGS.size());
-
-        log.debug("PROMPT: {}", SYSTEM_PROMPT);
-
-        String resultJson = llmClient.chat(SYSTEM_PROMPT, userMessage, toolsJson);
-
+        String resultJson = llmClient.chat(systemPrompt, userMessage, toolsJson);
         log.info("Tagger response: {}", resultJson);
         return resultJson;
     }

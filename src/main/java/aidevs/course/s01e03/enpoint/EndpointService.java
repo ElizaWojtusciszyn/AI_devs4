@@ -12,10 +12,7 @@ public class EndpointService {
     private ProcessMessage process;
 
     public MessageResponse process(MessageRequest messageRequest) throws IOException {
-        var message = Message.builder()
-                .message(messageRequest.msg)
-                .sessionID(messageRequest.sessionID)
-                .build();
+        var message = new Message(messageRequest.sessionID(), messageRequest.msg());
         var response = process.process(message);
         return new MessageResponse(response);
     }

@@ -1,14 +1,14 @@
 package aidevs.course.s01e02;
 
 import aidevs.course.LessonRunner;
+import aidevs.course.agents.ChatService;
 import aidevs.course.prompt.PromptLoader;
 import aidevs.course.s01e02.entities.FindHimSolutionResponse;
 import aidevs.course.s01e02.entities.Person;
 import aidevs.course.solution.SolutionSender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -21,11 +21,10 @@ import java.util.stream.Collectors;
 
 @Component
 @ConditionalOnProperty(name = "spring.hub.lesson", havingValue = "s01e02")
+@Slf4j
 public class S01E02Runner implements LessonRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(S01E02Runner.class);
-
-    private final ChatService_2 chatService2;
+    private final ChatService chatService;
     private final ObjectMapper objectMapper;
     private final SolutionSender solutionSender;
     private final PromptLoader promptLoader;
@@ -34,7 +33,7 @@ public class S01E02Runner implements LessonRunner {
     private final String powerPlantsUrl;
 
     public S01E02Runner(
-            ChatService_2 chatService2,
+            ChatService chatService,
             ObjectMapper objectMapper,
             SolutionSender solutionSender,
             PromptLoader promptLoader,
@@ -42,7 +41,7 @@ public class S01E02Runner implements LessonRunner {
             @Value("${spring.hub.key}") String apiKey,
             @Value("${api.s01e02.power-plants-url}") String powerPlantsUrl
     ) {
-        this.chatService2 = chatService2;
+        this.chatService = chatService;
         this.objectMapper = objectMapper;
         this.solutionSender = solutionSender;
         this.promptLoader = promptLoader;
@@ -68,15 +67,15 @@ public class S01E02Runner implements LessonRunner {
                 .map(p -> "- " + p.getName() + " " + p.getSurname() + ", born " + p.getBorn())
                 .collect(Collectors.joining("\n"));
 
-        String systemPrompt = promptLoader.load("s01e02/system-prompt.md", Map.of(
+        String systemPrompt = promptLoader.load("prompts/s01e02/system-prompt.md", Map.of(
                 "apiKey", apiKey,
                 "suspects", suspectsInfo,
                 "powerPlants", powerPlantsJson
         ));
 
-        String userPrompt = promptLoader.load("s01e02/user-prompt.md");
+        String userPrompt = promptLoader.load("prompts/s01e02/user-prompt.md");
 
-        String result = chatService2.chat(systemPrompt, userPrompt);
+        String result = chatService.chat(systemPrompt, userPrompt);
         log.info("Agent result: {}", result);
 
         String jsonStr = result.contains("{")

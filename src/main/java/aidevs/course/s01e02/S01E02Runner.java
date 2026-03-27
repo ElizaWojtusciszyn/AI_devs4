@@ -31,6 +31,7 @@ public class S01E02Runner implements LessonRunner {
     private final PromptLoader promptLoader;
     private final RestClient restClient;
     private final String apiKey;
+    private final String powerPlantsUrl;
 
     public S01E02Runner(
             ChatService_2 chatService2,
@@ -38,7 +39,8 @@ public class S01E02Runner implements LessonRunner {
             SolutionSender solutionSender,
             PromptLoader promptLoader,
             RestClient.Builder restClientBuilder,
-            @Value("${spring.hub.key}") String apiKey
+            @Value("${spring.hub.key}") String apiKey,
+            @Value("${api.s01e02.power-plants-url}") String powerPlantsUrl
     ) {
         this.chatService2 = chatService2;
         this.objectMapper = objectMapper;
@@ -46,6 +48,7 @@ public class S01E02Runner implements LessonRunner {
         this.promptLoader = promptLoader;
         this.restClient = restClientBuilder.build();
         this.apiKey = apiKey;
+        this.powerPlantsUrl = powerPlantsUrl;
     }
 
     @Override
@@ -90,7 +93,7 @@ public class S01E02Runner implements LessonRunner {
 
     private String fetchPowerPlants() {
         return restClient.get()
-                .uri("REMOVED/data/" + apiKey + "/findhim_locations.json")
+                .uri(powerPlantsUrl, apiKey)
                 .retrieve()
                 .body(String.class);
     }

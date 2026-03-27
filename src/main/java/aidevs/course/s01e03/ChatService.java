@@ -18,8 +18,8 @@ public class ChatService {
     ) {
         this.chatClient = builder.build()
                 .mutate()
-                .defaultTools(toolList)          // własne narzędzia
-                .defaultTools(mcpToolCallbackProvider)  // + MCP
+                .defaultTools(toolList)
+                .defaultTools(mcpToolCallbackProvider)
                 .build();
     }
 

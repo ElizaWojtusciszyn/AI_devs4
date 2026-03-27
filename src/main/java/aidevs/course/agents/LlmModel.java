@@ -1,4 +1,4 @@
-package aidevs.course.client;
+package aidevs.course.agents;
 
 import java.util.Arrays;
 

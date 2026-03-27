@@ -1,6 +1,6 @@
 package aidevs.course.s01e01.pipeline;
 
-import aidevs.course.client.LlmClient;
+import aidevs.course.agents.LlmClient;
 import aidevs.course.prompt.Claude.ClaudeInputSchema;
 import aidevs.course.prompt.Claude.ClaudeProperties;
 import aidevs.course.prompt.Claude.ClaudeTool;

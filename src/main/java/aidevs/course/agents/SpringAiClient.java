@@ -1,4 +1,4 @@
-package aidevs.course.client;
+package aidevs.course.agents;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

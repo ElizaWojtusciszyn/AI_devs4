@@ -1,4 +1,4 @@
-package aidevs.course.client;
+package aidevs.course.agents;
 
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;

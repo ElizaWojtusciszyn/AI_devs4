@@ -7,14 +7,14 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ChatService {
+public class ChatService_2 {
 
     private final ChatClient chatClient;
 
-    public ChatService(ChatClient.Builder builder,
-                       AccessLevelTool accessLevelTool,
-                       LocationTool locationTool,
-                       CalculateLocationTool calculateLocationTool
+    public ChatService_2(ChatClient.Builder builder,
+                         AccessLevelTool accessLevelTool,
+                         LocationTool locationTool,
+                         CalculateLocationTool calculateLocationTool
     ) {
         this.chatClient = builder.build()
                 .mutate()

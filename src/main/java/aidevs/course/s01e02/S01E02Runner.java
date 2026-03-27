@@ -25,7 +25,7 @@ public class S01E02Runner implements LessonRunner {
 
     private static final Logger log = LoggerFactory.getLogger(S01E02Runner.class);
 
-    private final ChatService chatService;
+    private final ChatService_2 chatService2;
     private final ObjectMapper objectMapper;
     private final SolutionSender solutionSender;
     private final PromptLoader promptLoader;
@@ -33,14 +33,14 @@ public class S01E02Runner implements LessonRunner {
     private final String apiKey;
 
     public S01E02Runner(
-            ChatService chatService,
+            ChatService_2 chatService2,
             ObjectMapper objectMapper,
             SolutionSender solutionSender,
             PromptLoader promptLoader,
             RestClient.Builder restClientBuilder,
             @Value("${spring.hub.key}") String apiKey
     ) {
-        this.chatService = chatService;
+        this.chatService2 = chatService2;
         this.objectMapper = objectMapper;
         this.solutionSender = solutionSender;
         this.promptLoader = promptLoader;
@@ -73,7 +73,7 @@ public class S01E02Runner implements LessonRunner {
 
         String userPrompt = promptLoader.load("s01e02/user-prompt.md");
 
-        String result = chatService.chat(systemPrompt, userPrompt);
+        String result = chatService2.chat(systemPrompt, userPrompt);
         log.info("Agent result: {}", result);
 
         String jsonStr = result.contains("{")

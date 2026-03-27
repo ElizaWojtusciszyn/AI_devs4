@@ -1,6 +1,6 @@
 package aidevs.course;
 
-import aidevs.course.client.LlmClient;
+import aidevs.course.agents.LlmClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

@@ -1,5 +1,6 @@
 HELP.md
 src/main/resources/application.yml
+src/main/instructions/*
 
 target/
 .mvn/wrapper/maven-wrapper.jar

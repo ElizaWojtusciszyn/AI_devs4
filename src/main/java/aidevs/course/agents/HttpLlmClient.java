@@ -1,4 +1,4 @@
-package aidevs.course.client;
+package aidevs.course.agents;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

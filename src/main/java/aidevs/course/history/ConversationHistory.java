@@ -2,6 +2,7 @@ package aidevs.course.history;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,44 +16,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Universal per-session conversation history.
- * Each session is stored as a JSON file: {baseDir}/{sessionId}.json
- * Every added message is also appended to a shared log: {baseDir}/conversation.log
+ * Per-session conversation history (debug log).
+ * Each session stored as pretty-printed JSON: {baseDir}/{sessionId}.json
+ * Format: [{"role":"user","content":"..."},{"role":"assistant","content":"..."}]
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ConversationHistory {
 
+    public record Entry(String role, String content) {}
+
     private final ObjectMapper objectMapper;
 
-    public List<String> add(Path baseDir, String sessionId, String message) throws IOException {
+    public void addEntry(Path baseDir, String sessionId, String role, String content) throws IOException {
         if (!Files.exists(baseDir)) {
             Files.createDirectories(baseDir);
         }
-        List<String> history = load(baseDir, sessionId);
-        history.add(message);
+        List<Entry> history = load(baseDir, sessionId);
+        history.add(new Entry(role, content));
         save(baseDir, sessionId, history);
-        appendLog(baseDir, sessionId, message);
-        return history;
+        appendLog(baseDir, sessionId, role, content);
     }
 
-    public List<String> load(Path baseDir, String sessionId) throws IOException {
+    public List<Entry> load(Path baseDir, String sessionId) throws IOException {
         Path file = sessionFile(baseDir, sessionId);
         if (!Files.exists(file)) return new ArrayList<>();
         return objectMapper.readValue(file.toFile(), new TypeReference<>() {});
-    }
-
-    public void save(Path baseDir, String sessionId, List<String> history) throws IOException {
-        objectMapper.writeValue(sessionFile(baseDir, sessionId).toFile(), history);
     }
 
     public void clear(Path baseDir, String sessionId) throws IOException {
         Files.deleteIfExists(sessionFile(baseDir, sessionId));
     }
 
-    private void appendLog(Path baseDir, String sessionId, String message) throws IOException {
-        String entry = "[%s] [%s] %s%n".formatted(LocalDateTime.now(), sessionId, message);
+    private void save(Path baseDir, String sessionId, List<Entry> history) throws IOException {
+        objectMapper.writer(SerializationFeature.INDENT_OUTPUT)
+                .writeValue(sessionFile(baseDir, sessionId).toFile(), history);
+    }
+
+    private void appendLog(Path baseDir, String sessionId, String role, String content) throws IOException {
+        String entry = "[%s] [%s] [%s] %s%n".formatted(LocalDateTime.now(), sessionId, role, content);
         Files.writeString(baseDir.resolve("conversation.log"), entry,
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }

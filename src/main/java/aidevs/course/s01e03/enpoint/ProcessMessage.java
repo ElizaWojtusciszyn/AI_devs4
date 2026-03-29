@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -24,13 +23,14 @@ public class ProcessMessage {
     private final ConversationHistory conversationHistory;
 
     public String process(Message message) throws IOException {
-        List<String> history = conversationHistory.add(SESSIONS_DIR, message.sessionID(), message.message());
+        conversationHistory.addEntry(SESSIONS_DIR, message.sessionID(), "user", message.message());
 
-        String systemPrompt = promptLoader.load("prompts/s01e03/system-prompt.md", Map.of(
-                "messageHistory", history.toString())
-        );
+        String systemPrompt = promptLoader.load("prompts/s01e03/system-prompt.md",
+                Map.of("sessionId", message.sessionID()));
 
-        String result = chatService.chat(systemPrompt, message.message());
+        String result = chatService.chat(message.sessionID(), systemPrompt, message.message());
+
+        conversationHistory.addEntry(SESSIONS_DIR, message.sessionID(), "assistant", result);
         log.info("Agent result: {}", result);
 
         return result;

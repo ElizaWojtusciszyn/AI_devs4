@@ -1,0 +1,7 @@
+[ {
+  "role" : "user",
+  "content" : "1, 2, 3... próba chata. Jestem tu nowy i sprawdzam jak to działa"
+}, {
+  "role" : "assistant",
+  "content" : "Cześć! Hej, witaj w zespole! \uD83D\uDC4B \n\nWszystko działa, widzę cię. Jestem Marek, obsługuję tu logistykę paczek. Jeśli będziesz potrzebować sprawdzić status przesyłki albo coś przekierować, pisz do mnie. \n\nCo się słyszy?"
+} ]

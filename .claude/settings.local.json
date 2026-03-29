@@ -17,7 +17,23 @@
       "Bash(jar -tf \"$HOME/.m2/repository/org/springframework/ai/spring-ai-model/2.0.0-M2/spring-ai-model-2.0.0-M2.jar\")",
       "Bash(grep -v \"class$\")",
       "Bash(grep -v \"$\")",
-      "Bash(grep \"\\\\.class$\")"
+      "Bash(grep \"\\\\.class$\")",
+      "Bash(jar tf:*)",
+      "Bash(xargs -I{} sh -c \"jar tf {} 2>/dev/null | grep -i \"\"InMemory\\\\|ChatMemory\"\" | sed \"\"s|^|{}:|\"\"\")",
+      "Bash(jar xf:*)",
+      "Bash(javap -p ~/.m2/repository/org/springframework/ai/spring-ai-model/2.0.0-M2/spring-ai-model-2.0.0-M2.jar)",
+      "Bash(cd /tmp)",
+      "Bash(mkdir -p spring-ai-inspect)",
+      "Bash(javap -p spring-ai-inspect/org/springframework/ai/chat/memory/MessageWindowChatMemory.class)",
+      "Bash(javap -p org/springframework/ai/chat/memory/MessageWindowChatMemory.class)",
+      "Bash(javap -p org/springframework/ai/chat/client/advisor/MessageChatMemoryAdvisor.class)",
+      "Bash(javap -p org/springframework/ai/chat/client/advisor/MessageChatMemoryAdvisor$Builder.class)",
+      "Bash(find C:/Users/eliza/.m2/repository/org/springframework/ai -name spring-ai-core-*.jar)",
+      "Bash(find C:/Users/eliza -name *.jar -path *spring-ai*)",
+      "Bash(find C:/Users/eliza/.m2/repository/org/springframework/ai -name spring-ai-model-*.jar)",
+      "Read(//tmp/org/springframework/ai/chat/messages/**)",
+      "Bash(javap -p -classpath spring-ai-model-2.0.0-M2.jar org.springframework.ai.chat.messages.ToolResponseMessage)",
+      "Bash(javap -p -classpath spring-ai-mcp-2.0.0-M2.jar org.springframework.ai.mcp.SyncMcpToolCallbackProvider)"
     ]
   }
 }
